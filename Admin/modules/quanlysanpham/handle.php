@@ -17,12 +17,16 @@ if(isset($_POST['add_product'])){
      header("Location:../../index.php?action=quanlysanpham&query=add");
     
 } elseif(isset($_POST['update_product'])){    
-        $stmt = $conn->prepare("UPDATE tbl_product SET name_product = ?, price_product=?, img_product=?,
-        soLuong=?, tinhTrang=?, info_product=?, id_danhmuc=?");
-        $stmt->bind_param("sisiisi", $name_product, $price, $hinhanh, $soLuong, $tinhTrang, $info_product, $danhmuc);
-        $stmt->execute();
-        move_uploaded_file($hinhanh_tmp,'uploads/'.$hinhanh);
-        header("Location:../../index.php?action=quanlysanpham&query=add");
+    if($_POST['hinhanh']){
+        $stmt = $conn->prepare("UPDATE tbl_product SET name_product=?, price_product=?, img_product=?, soLuong=?, tinhTrang=?, info_product=?, id_danhmuc=? WHERE id_product=?");
+        $stmt->bind_param("sisiisii", $name_product, $price, $hinhanh, $soLuong, $tinhTrang, $info_product, $danhmuc, $_GET['id']);
+        move_uploaded_file($hinhanh_tmp, 'uploads/'.$hinhanh);
+    }else{
+        $stmt = $conn->prepare("UPDATE tbl_product SET name_product=?, price_product=?, soLuong=?, tinhTrang=?, info_product=?, id_danhmuc=? WHERE id_product=?");
+        $stmt->bind_param("siiisii", $name_product, $price, $soLuong, $tinhTrang, $info_product, $danhmuc, $_GET['id']);
+    }
+    $stmt->execute();
+    header("Location:../../index.php?action=quanlysanpham&query=add");
 } else {
     $id = $_GET['id'];
     $select_img = "SELECT img_product FROM tbl_product WHERE id_product = '$id'";
